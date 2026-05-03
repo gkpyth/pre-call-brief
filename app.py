@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request
 from dotenv import load_dotenv
+from datetime import datetime
 import requests
 import os
 
@@ -12,7 +13,7 @@ NEWS_API_URL = "https://newsapi.org/v2/everything"
 
 @app.route("/")
 def index():
-    return render_template("index.html")
+    return render_template("index.html", current_year=datetime.now().year)
 
 @app.route("/results")
 def results():
