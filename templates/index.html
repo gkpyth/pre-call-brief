@@ -15,7 +15,7 @@
         <h1>Know Before<br>You <span class="accent">Call.</span></h1>
         <p class="subtitle">Enter a company name and get a real-time news brief before your next customer call.</p>
 
-        <form action="/results" method="POST" class="search-from">
+        <form action="/results" method="POST" class="search-from" id="search-form">
             <div class="input-wrapper">
                 <input
                     type="text"
@@ -24,7 +24,7 @@
                     required
                     autocomplete="off"
                 />
-                <button type="submit">Brief Me</button>
+                <button type="submit" id="submit-btn">Brief Me</button>
             </div>
         </form>
 
@@ -36,6 +36,14 @@
     <footer>
         <p>Built with Python, Flask & NewsAPI by <span>Ghaleb Khadra</span> &middot; {{ current_year }}</p>
     </footer>
+
+    <script>
+        document.getElementById("search-form").addEventListener("submit", function() {
+            const btn = document.getElementById("submit-btn");
+            btn.innerHTML = '<span class="spinner"></span>';
+            btn.disabled = true;
+        });
+    </script>
 
 </body>
 </html>
