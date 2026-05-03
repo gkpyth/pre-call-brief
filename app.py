@@ -27,17 +27,31 @@ def results():
         "apiKey": NEWS_API_KEY,
     }
 
-    response = requests.get(NEWS_API_URL, params=params)
-    data = response.json()
+    try:
+        response = requests.get(NEWS_API_URL, params=params)
+        data = response.json()
+
+        if data.get("status") != "ok":
+            error = data.get("message", "Something went wrong with the news feed.")
+            return render_template("results.html", company=company, articles=[], error=error, current_year=datetime.now().year)
+
+    except requests.exceptions.Timeout:
+        error = "The request timed out. Please try again."
+        return render_template("results.html", company=company, articles=[], erorr=error, current_year=datetime.now().year)
+
+    except requests.exceptions.RequestException:
+        error = "Could not reach the news service. Check your connection and try again."
+        return render_template("results.html", company=company, articles=[], error=error,current_year=datetime.now().year)
+
+    blocked_domains = ["yahoo.com", "youtube.com", "youtu.be", "vimeo.com", "dailymotion.com"]
 
     seen = set()
     unique_articles = []
-    video_domains = ["yahoo.com", "youtube.com", "youtu.be", "vimeo.com", "dailymotion.com"]
     for article in data.get("articles", []):
         url = article.get("url", "")
         if article.get("title") == ["Removed"]:
             continue
-        if article["url"] not in seen and not any(domain in url for domain in video_domains):
+        if article["url"] not in seen and not any(domain in url for domain in blocked_domains):
             seen.add(article["url"])
             unique_articles.append(article)
 
