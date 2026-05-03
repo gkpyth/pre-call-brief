@@ -28,7 +28,7 @@ def results():
     }
 
     try:
-        response = requests.get(NEWS_API_URL, params=params)
+        response = requests.get(NEWS_API_URL, params=params, timeout=10)
         data = response.json()
 
         if data.get("status") != "ok":
@@ -37,7 +37,7 @@ def results():
 
     except requests.exceptions.Timeout:
         error = "The request timed out. Please try again."
-        return render_template("results.html", company=company, articles=[], erorr=error, current_year=datetime.now().year)
+        return render_template("results.html", company=company, articles=[], error=error, current_year=datetime.now().year)
 
     except requests.exceptions.RequestException:
         error = "Could not reach the news service. Check your connection and try again."
@@ -49,7 +49,7 @@ def results():
     unique_articles = []
     for article in data.get("articles", []):
         url = article.get("url", "")
-        if article.get("title") == ["Removed"]:
+        if article.get("title") == "[Removed]":
             continue
         if article["url"] not in seen and not any(domain in url for domain in blocked_domains):
             seen.add(article["url"])
