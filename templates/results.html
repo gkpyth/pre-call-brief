@@ -2,9 +2,59 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brief: {{ company }} — Pre-Call Brief</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
+
+    <div class="results-header">
+        <a href="/" class="btn-back">← New Search</a>
+        <div class="results-title">
+            <span class="badge">Pre-Call Brief</span>
+            <h1>{{ company }}</h1>
+            <p class="subtitle">{{ articles|length }} recent articles found</p>
+        </div>
+    </div>
+
+    <main class="results-grid">
+        {% if articles %}
+            {% for article in articles %}
+            <div class="card">
+                <div class="card-image">
+                    <img
+                        src="{{ article.urlToImage if article.urlToImage else url_for('static', filename='fallback.png') }}"
+                        alt="{{ article.title }}"
+                        onerror="this.src='{{ url_for('static', filename='fallback.png') }}'"
+                    />
+                </div>
+                <div class="card-body">
+                    <div class="card-meta">
+                        <span class="card-source">{{ article.source.name }}</span>
+                        <span class="card-date">{{ article.publishedAt[:10] }}</span>
+                    </div>
+                    <h2 class="card-title">{{ article.title }}</h2>
+                    <p class="card-description">{{ article.description or "No description available." }}</p>
+                    <a href="{{ article.url }}" target="_blank" class="card-link">Read Full Article →</a>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="no-results">
+                <p>No articles found for <strong>{{ company }}</strong>. Try a different company name.</p>
+                <a href="/" class="btn-back">← Try Again</a>
+            </div>
+        {% endif %}
+    </main>
+
+    <button class="btn-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">↑</button>
+
+    <footer>
+        <p>Built with Python, Flask & NewsAPI by <span>Ghaleb Khadra</span> &middot; {{ current_year }}</p>
+    </footer>
 
 </body>
 </html>

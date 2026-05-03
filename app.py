@@ -15,24 +15,33 @@ NEWS_API_URL = "https://newsapi.org/v2/everything"
 def index():
     return render_template("index.html", current_year=datetime.now().year)
 
-@app.route("/results")
+@app.route("/results", methods=["POST"])
 def results():
-    company = request.form.get("company")
+    company = request.form.get("company").title()
 
     params = {
         "q": company,
-        "sortBy": "publishedAt",
+        "sortBy": "relevancy",
         "language": "en",
-        "pageSize": 10,
+        "pageSize": 12,
         "apiKey": NEWS_API_KEY,
     }
 
     response = requests.get(NEWS_API_URL, params=params)
     data = response.json()
 
-    articles = data.get("articles", [])
+    seen = set()
+    unique_articles = []
+    video_domains = ["yahoo.com", "youtube.com", "youtu.be", "vimeo.com", "dailymotion.com"]
+    for article in data.get("articles", []):
+        url = article.get("url", "")
+        if article.get("title") == ["Removed"]:
+            continue
+        if article["url"] not in seen and not any(domain in url for domain in video_domains):
+            seen.add(article["url"])
+            unique_articles.append(article)
 
-    return render_template("results.html", company=company, articles=articles)
+    return render_template("results.html", company=company, articles=unique_articles, current_year=datetime.now().year)
 
 
 if __name__ == "__main__":
